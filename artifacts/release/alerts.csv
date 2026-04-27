@@ -1,0 +1,3 @@
+ts,severity,note,src,dst,msg,sub,uid
+2026-04-27T05:25:11+00:00,medium,IDS::PortScan,10.0.0.5,,Port scan: 10.0.0.5 contacted 15 distinct ports,count=15 window=1.0 min,
+2026-04-27T05:25:14.049000+00:00,critical,IDS::ConnFlood,10.0.0.6,10.0.0.10,Connection flood: 10.0.0.6 opened 200 connections in 30.0 secs,count=200 window=30.0 secs,CykGTu4KbKL08bBume

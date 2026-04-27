@@ -1,0 +1,17 @@
+time="2026-04-26T22:24:43-07:00" level=warning msg="No services to build"
+time="2026-04-26T22:24:43-07:00" level=warning msg="No services to build"
+ Container zeek-ids-skeleton-zeek-run-a1c7c527a6c9 Creating 
+ Container zeek-ids-skeleton-zeek-run-a1c7c527a6c9 Created 
+1777267515.049000 warning in /usr/local/zeek/share/zeek/base/misc/find-filtered-trace.zeek, line 69: The analyzed trace file was determined to contain only TCP control packets, which may indicate it's been pre-filtered.  By default, Zeek reports the missing segments for this type of trace, but the 'detect_filtered_trace' option may be toggled if that's not desired.
+time="2026-04-26T22:24:50-07:00" level=warning msg="No services to build"
+ Container zeek-ids-zeek Starting 
+ Container zeek-ids-zeek Started 
+time="2026-04-26T22:24:51-07:00" level=warning msg="No services to build"
+ Container zeek-ids-zeek Waiting 
+ Container zeek-ids-zeek Exited 
+ Container zeek-ids-skeleton-analyzer-run-5953a10d3918 Creating 
+ Container zeek-ids-skeleton-analyzer-run-5953a10d3918 Created 
+2026-04-27 05:24:56,269 INFO analyzer reading notices from /logs/notice.log
+2026-04-27 05:24:57,196 WARNING matplotlib Matplotlib created a temporary cache directory at /tmp/matplotlib-ya9b5gtx because the default path (/home/analyzer/.config/matplotlib) is not a writable directory; it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+2026-04-27 05:24:58,030 INFO matplotlib.font_manager generated new fontManager
+2026-04-27 05:24:59,135 INFO analyzer parsed=2 accepted=2 dropped=0 -> /out

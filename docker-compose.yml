@@ -1,0 +1,50 @@
+services:
+  zeek:
+    build:
+      context: ./zeek
+      dockerfile: Dockerfile
+    image: zeek-ids/zeek:local
+    container_name: zeek-ids-zeek
+    user: "1000:1000"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    volumes:
+      - ./pcaps:/pcaps:ro
+      - ./zeek/scripts:/scripts:ro
+      - ./zeek/logs:/logs:rw
+    working_dir: /logs
+    entrypoint: ["/usr/local/zeek/bin/zeek"]
+    command: ["-C", "-r", "/pcaps/sample/demo.pcap", "/scripts/main.zeek"]
+    networks: []
+
+  analyzer:
+    build:
+      context: ./analyzer
+      dockerfile: Dockerfile
+    image: zeek-ids/analyzer:local
+    container_name: zeek-ids-analyzer
+    user: "1000:1000"
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    environment:
+      - ANALYZER_LOG_DIR=/logs
+      - ANALYZER_OUT_DIR=/out
+      - ANALYZER_RATE_LIMIT_PER_SEC=50
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./zeek/logs:/logs:ro
+      - ./artifacts/release:/out:rw
+    depends_on:
+      zeek:
+        condition: service_completed_successfully
+    networks: []

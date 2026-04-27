@@ -1,0 +1,14 @@
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.coverage
+**/.venv
+**/venv
+.git
+.github
+docs/proposal.pdf
+artifacts/runs
+zeek/logs
+README.md
+*.md
+!analyzer/README.md
