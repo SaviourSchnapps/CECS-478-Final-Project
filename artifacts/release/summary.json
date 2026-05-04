@@ -1,11 +1,11 @@
 {
   "by_note": {
     "IDS::ConnFlood": 1,
-    "IDS::PortScan": 1
+    "IDS::PortScan": 2
   },
   "by_severity": {
     "critical": 1,
-    "medium": 1
+    "medium": 2
   },
   "top_sources": [
     {
@@ -14,8 +14,12 @@
     },
     {
       "count": 1,
+      "src": "10.0.0.7"
+    },
+    {
+      "count": 1,
       "src": "10.0.0.6"
     }
   ],
-  "total_alerts": 2
+  "total_alerts": 3
 }

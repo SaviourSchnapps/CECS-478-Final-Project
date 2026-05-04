@@ -72,7 +72,8 @@ def _tcp_syn(src_ip: str, dst_ip: str, src_port: int, dst_port: int, seq: int) -
 
 def write_pcap(path: Path, *, scan_ports: int = 20, flood_count: int = 250,
                base_ts: int | None = None) -> dict:
-    scanner = "10.0.0.5"
+    scanner_a = "10.0.0.5"
+    scanner_b = "10.0.0.7"
     flooder = "10.0.0.6"
     target = "10.0.0.10"
     if base_ts is None:
@@ -82,9 +83,15 @@ def write_pcap(path: Path, *, scan_ports: int = 20, flood_count: int = 250,
     seq = 1000
 
     for i in range(scan_ports):
-        pkt = _tcp_syn(scanner, target, 50000 + i, 1 + i, seq)
+        pkt = _tcp_syn(scanner_a, target, 50000 + i, 1 + i, seq)
         seq += 1
         records.append((base_ts + i // 5, (i % 5) * 10_000, pkt))
+
+    scan_b_start = base_ts + 10
+    for i in range(scan_ports):
+        pkt = _tcp_syn(scanner_b, target, 51000 + i, 100 + i, seq)
+        seq += 1
+        records.append((scan_b_start + i // 5, (i % 5) * 10_000, pkt))
 
     flood_start = base_ts + 30
     for i in range(flood_count):

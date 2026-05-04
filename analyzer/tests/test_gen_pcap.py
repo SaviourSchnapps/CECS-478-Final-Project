@@ -8,9 +8,16 @@ from pathlib import Path
 
 import pytest
 
-# tools/ is a sibling of analyzer/ — add it to path explicitly
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "tools"))
+# tools/ is a sibling of analyzer/ in the repo, but the dev container only
+# ships the analyzer/ subtree, so the suite is skipped there. Probe both layouts.
+_CANDIDATES = [
+    Path(__file__).resolve().parents[2] / "tools",  # repo-root layout (local runs)
+    Path("/tools"),                                  # mounted at /tools in CI/container
+]
+_TOOLS_DIR = next((p for p in _CANDIDATES if (p / "gen_pcap.py").exists()), None)
+if _TOOLS_DIR is None:
+    pytest.skip("gen_pcap.py not reachable in this layout", allow_module_level=True)
+sys.path.insert(0, str(_TOOLS_DIR))
 
 import gen_pcap  # noqa: E402
 
@@ -40,9 +47,10 @@ def _read_records(path: Path):
 def test_default_pcap_has_expected_packet_count(tmp_path: Path):
     out = tmp_path / "demo.pcap"
     info = gen_pcap.write_pcap(out, scan_ports=20, flood_count=250)
-    assert info["total_packets"] == 270
+    # two scanners (scan_ports each) + one flood
+    assert info["total_packets"] == 2 * 20 + 250
     records = _read_records(out)
-    assert len(records) == 270
+    assert len(records) == 2 * 20 + 250
 
 
 def test_pcap_packets_are_tcp_syn(tmp_path: Path):
@@ -63,11 +71,16 @@ def test_pcap_distinct_destination_ports_in_scan(tmp_path: Path):
     out = tmp_path / "demo.pcap"
     gen_pcap.write_pcap(out, scan_ports=15, flood_count=0)
     records = _read_records(out)
-    dst_ports = set()
+    # two scanners, each hitting `scan_ports` distinct destination ports
+    assert len(records) == 2 * 15
+    by_src = {}
     for _, _, payload in records:
-        # TCP dst port is at offset eth(14) + ip(20) + 2
-        dst_ports.add(struct.unpack("!H", payload[14 + 20 + 2:14 + 20 + 4])[0])
-    assert len(dst_ports) == 15
+        src_ip = ".".join(str(b) for b in payload[14 + 12:14 + 16])
+        dst_port = struct.unpack("!H", payload[14 + 20 + 2:14 + 20 + 4])[0]
+        by_src.setdefault(src_ip, set()).add(dst_port)
+    assert len(by_src) == 2
+    for ports in by_src.values():
+        assert len(ports) == 15
 
 
 def test_pcap_zero_packets_still_writes_valid_header(tmp_path: Path):

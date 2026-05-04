@@ -2,6 +2,13 @@ SHELL := /bin/bash
 COMPOSE := docker compose
 RELEASE := artifacts/release
 
+# Synthetic pcap base timestamp. Defaults to the current wall-clock so
+# `make demo` produces evidence with up-to-date timestamps each run. Override
+# with `make demo PCAP_BASE_TS=1745000000` to reproduce the canonical release
+# output quoted in docs/FINAL_REPORT.md (counts are stable regardless of seed;
+# only ts values shift).
+PCAP_BASE_TS ?= $(shell date +%s)
+
 # Stop Git Bash / MSYS from mangling Unix-style paths into Windows paths
 # when passed to native binaries like docker.exe. Without this, args like
 # "/tools/gen_pcap.py" get rewritten to "C:/Program Files/Git/tools/...".
@@ -26,7 +33,7 @@ build:
 
 pcap: build
 	$(COMPOSE) run --rm --entrypoint "" -v "$(PWD)/tools:/tools:ro" -v "$(PWD)/pcaps:/pcaps:rw" \
-		analyzer python /tools/gen_pcap.py --out /pcaps/sample/demo.pcap
+		analyzer python /tools/gen_pcap.py --out /pcaps/sample/demo.pcap --base-ts $(PCAP_BASE_TS)
 	@mkdir -p $(RELEASE)
 	@cp pcaps/sample/demo.pcap $(RELEASE)/demo.pcap
 
